@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace CopyFolder
 {
@@ -12,6 +13,7 @@ namespace CopyFolder
     {
         private SaveData sd = new SaveData();
         private string saveDataTxt;
+
 
         public Form1()
         {
@@ -92,11 +94,10 @@ namespace CopyFolder
 
         private async void Btn_BeginCopy_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("是否開始複製!!") == DialogResult.Cancel)
+            if (MessageBox.Show("是否開始複製!!", "請確認", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
             {
                 return;
             }
-
             Btn_BeginCopy.Enabled = false;
             var dn = DateTime.Now;
             PB_Bar.Minimum = 0;
@@ -148,16 +149,18 @@ namespace CopyFolder
 
             }
             PB_Bar.Maximum = total;
-            
+
 
             tList.ForEach(t => { t.Start(); });
-            foreach (var trun in tList)
+            foreach (var item in tList)
             {
-                await trun;
+                await item;
             }
             #endregion
+
             var offset = DateTime.Now.Subtract(dn);
             MessageBox.Show($"執行玩並共花了\n{offset.Seconds}秒");
+            tList = null;
             Btn_BeginCopy.Enabled = true;
         }
 
